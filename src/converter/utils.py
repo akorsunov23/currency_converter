@@ -1,52 +1,44 @@
-import asyncio
-
-from src.core.config import KEY_API_CURRENTS
 from httpx import AsyncClient
 
+from src.core.config import KEY_API_CURRENTS
 
-async def calculate_converted(
-		_from: str = None,
-		_to: str = None,
-		volume: int = None
-):
-	"""
-	Подсчёт ответа на запрос.
-	:param _from: Валюта из которой переводим.
-	:param _to: Валюта, в которую нужно конвертировать.
-	:param volume: Количество для конвертации.
-	"""
-	cur_data = await get_data_to_api_coin_market(
-		currency=_from,
-		new_currency=_to
-	)
+
+async def calculate_converted(_from: str, _to: str, volume: int):
+    """
+    Подсчёт ответа на запрос.
+    :param _from: Валюта из которой переводим.
+    :param _to: Валюта, в которую нужно конвертировать.
+    :param volume: Количество для конвертации.
+    """
+    date_update, price = await get_data_to_api_coin_market(
+        currency=_from, new_currency=_to
+    )
+    all_price = round(price * volume, 3)
+
+    return date_update, all_price
 
 
 async def get_data_to_api_coin_market(
-		currency: str,
-		new_currency: str,
-) -> dict:
-	"""
-	Получение данных о валютах по API app.currencyapi.com.
-	:param currency: Валюта из которой переводим.
-	:param new_currency: Валюта, в которую нужно конвертировать.
-	"""
+    currency: str,
+    new_currency: str,
+) -> tuple:
+    """
+    Получение данных о валютах по API app.currencyapi.com.
+    :param currency: Валюта из которой переводим.
+    :param new_currency: Валюта, в которую нужно конвертировать.
+    """
 
-	url_request = f"https://api.currencyapi.com/v3/latest?apikey={KEY_API_CURRENTS}"
+    url_request = (f"https://api.currencyapi.com/v3/latest?"
+                   f"apikey={KEY_API_CURRENTS}&"
+                   f"currencies={new_currency}&"
+                   f"base_currency={currency}")
 
-	async with AsyncClient() as client:
-		response = await client.get(url_request)
-		response.raise_for_status()
+    async with AsyncClient() as client:
+        response = await client.get(url_request)
+        response.raise_for_status()
 
-	data = response.json()
+    data = response.json()
+    date_update = data["meta"]["last_updated_at"]
+    price = data["data"][new_currency]["value"]
 
-	currency_list: list = [currency, new_currency]
-	response_dict: dict = {}
-
-	for cur in currency_list:
-		if cur in data['data']:
-			response_dict[cur] = data['data'][cur]['value']
-
-	return response_dict
-
-
-asyncio.run(get_data_to_api_coin_market(currency="RUB", new_currency="EUR"))
+    return date_update, price
