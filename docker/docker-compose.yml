@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: currency_converter_backend
+    env_file:
+      - ../.env
+    ports:
+      - "8000:8000"
