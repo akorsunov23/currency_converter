@@ -1,2 +1,37 @@
-# currency_converter
-backend application for currency conversion
+### API конвертации валют
+
+Написан при помощи фреймворка FastAPI, и получением данных о курсах с API стороннего сервиса.
+
+
+### Установка и запуск:
+
+Необходимые требования:
+
+| Название                                          | описание                                                                |
+|---------------------------------------------------|-------------------------------------------------------------------------|
+| [Python<=3.10](https://www.python.org/downloads/) | Язык программирования                                                   |
+| [KEY_API_CURRENTS](https://app.currencyapi.com/)  | Ключ для доступа к API стороннего сервиса, полученный после регистрации |
+
+
+* Клонировать репозиторий;
+```angular2html
+git clone https://github.com/akorsunov23/currency_converter.git
+```
+* Перейти в проект;
+```angular2html
+cd currency_converter/
+```
+* Создать файл .env и добавить данные в соответствии с .env.template;
+* Запустить сборку и запуск контейнера.
+```angular2html
+docker compose -f docker/docker-compose.yml up --build
+```
+
+После запуска документация к API проекта будет доступна на localhost:8000/docs.  
+
+### Описание методов API:
+
+- GET (Конвертация валют в соответствии с полученными данными. Коды валют необходимо вводить строго в соответствии с ISO 4217)
+```angular2html
+/converter
+```
